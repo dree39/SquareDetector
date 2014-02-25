@@ -14,7 +14,7 @@ import org.apache.hadoop.util.*;
 // MapReduce code to count the rectangles in a graph.
 public class SquareDetector extends Configured implements Tool {
 	// Maps values to (Long,Long) pairs.
-	public static class ParseLongLongPairsMapper extends Mapper<LongWritable, Text, LongWritable, LongWritable> {
+	public static class FirstMapper extends Mapper<LongWritable, Text, LongWritable, LongWritable> {
 		LongWritable mkey = new LongWritable();
         LongWritable mval = new LongWritable();
 
@@ -39,7 +39,7 @@ public class SquareDetector extends Configured implements Tool {
 	}
 
 	// Creates the triads for each apex.
-    public static class PivotingAroundReducer extends Reducer<LongWritable, LongWritable, LongWritable, Text> {
+    public static class FirstReducer extends Reducer<LongWritable, LongWritable, LongWritable, Text> {
         // Produces triads, i.e. pairs where the first item is a node and the second item is a pair of its neighbours.
     	public void reduce(LongWritable key, Iterable<LongWritable> values, Context context)
             throws IOException, InterruptedException {
@@ -62,7 +62,7 @@ public class SquareDetector extends Configured implements Tool {
         }
     }
 
-    public static class TriadsMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
+    public static class SecondMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
         Text mkey = new Text();
         LongWritable mval = new LongWritable();
 
@@ -90,7 +90,7 @@ public class SquareDetector extends Configured implements Tool {
     }
 
     // Emits distinct triads sharing common ends.
-    public static class SquareReducer extends Reducer<Text, LongWritable, Text, Text> {
+    public static class SecondReducer extends Reducer<Text, LongWritable, Text, Text> {
         // Produces pairs where the first item is the vertex key and the second item is a single distinct square.
         public void reduce(Text key, Iterable<LongWritable> values, Context context)
             throws IOException, InterruptedException {
@@ -113,7 +113,7 @@ public class SquareDetector extends Configured implements Tool {
     }
 
     // Detects wrongful rectangles.
-    public static class EndsMapper extends Mapper<LongWritable, Text, Text, Text> {
+    public static class ThirdMapper extends Mapper<LongWritable, Text, Text, Text> {
         Text mKey = new Text();
         Text mVal = new Text();
 
@@ -141,7 +141,7 @@ public class SquareDetector extends Configured implements Tool {
     }
 
     // Emits partitions.
-    public static class PartitionReducer extends Reducer<Text, Text, Text, Text> {
+    public static class ThirdReducer extends Reducer<Text, Text, Text, Text> {
         // Produces pairs where the first item is one set partition and the second item is the other one.
         public void reduce(Text key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException {
@@ -173,8 +173,8 @@ public class SquareDetector extends Configured implements Tool {
         job1.setOutputValueClass(Text.class);
 
         job1.setJarByClass(SquareDetector.class);
-        job1.setMapperClass(ParseLongLongPairsMapper.class);
-        job1.setReducerClass(PivotingAroundReducer.class);
+        job1.setMapperClass(FirstMapper.class);
+        job1.setReducerClass(FirstReducer.class);
 
         job1.setInputFormatClass(TextInputFormat.class);
         job1.setOutputFormatClass(TextOutputFormat.class);
@@ -193,8 +193,8 @@ public class SquareDetector extends Configured implements Tool {
         job2.setOutputValueClass(Text.class);
 
         job2.setJarByClass(SquareDetector.class);
-        job2.setMapperClass(TriadsMapper.class);
-        job2.setReducerClass(SquareReducer.class);
+        job2.setMapperClass(SecondMapper.class);
+        job2.setReducerClass(SecondReducer.class);
 
         job2.setInputFormatClass(TextInputFormat.class);
         job2.setOutputFormatClass(TextOutputFormat.class);
@@ -213,8 +213,8 @@ public class SquareDetector extends Configured implements Tool {
         job3.setOutputValueClass(Text.class);
 
         job3.setJarByClass(SquareDetector.class);
-        job3.setMapperClass(EndsMapper.class);
-        job3.setReducerClass(PartitionReducer.class);
+        job3.setMapperClass(ThirdMapper.class);
+        job3.setReducerClass(ThirdReducer.class);
 
         job3.setInputFormatClass(TextInputFormat.class);
         job3.setOutputFormatClass(TextOutputFormat.class);
