@@ -76,7 +76,7 @@ public class SquareDetector extends Configured implements Tool {
                 if (!tokenizer.hasMoreTokens())
                     throw new RuntimeException("Invalid edge line: " + line);
                 v = tokenizer.nextToken();
-                if (v.contains(",")) {
+                if (check(v)) {
                     mkey.set(v);
                     mval.set(Long.parseLong(k));
                 }
@@ -89,9 +89,7 @@ public class SquareDetector extends Configured implements Tool {
         }
     }
 
-    // Emits distinct triads sharing common ends.
     public static class SecondReducer extends Reducer<Text, LongWritable, Text, Text> {
-        // Produces pairs where the first item is the vertex key and the second item is a single distinct square.
         public void reduce(Text key, Iterable<LongWritable> values, Context context)
             throws IOException, InterruptedException {
             ArrayList<Long> storage = new ArrayList<Long>();
@@ -100,6 +98,7 @@ public class SquareDetector extends Configured implements Tool {
             while (itr.hasNext())
                 storage.add(itr.next().get());
 
+            // Emits pairs of triads sharing common ends.
             if (storage.size() > 1) {
                 Collections.sort(storage);
                 if (storage.get(0) != -1) {
@@ -127,7 +126,7 @@ public class SquareDetector extends Configured implements Tool {
                 if (!tokenizer.hasMoreTokens())
                     throw new RuntimeException("Invalid edge line: " + line);
                 v = tokenizer.nextToken();
-                if (v.contains(",")) {
+                if (check(v)) {
                     mKey.set(v);
                     mVal.set(k);
                 }
@@ -228,6 +227,10 @@ public class SquareDetector extends Configured implements Tool {
         if (outcome == 0) outcome = job2.waitForCompletion(true) ? 0 : 1;
         if (outcome == 0) outcome = job3.waitForCompletion(true) ? 0 : 1;
         return outcome;
+    }
+
+    private static boolean check(String str) {
+        return str.contains(",");
     }
 
     public static void main(String[] args) throws Exception {
