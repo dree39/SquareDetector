@@ -139,9 +139,7 @@ public class SquareDetector extends Configured implements Tool {
         }
     }
 
-    // Emits partitions.
     public static class ThirdReducer extends Reducer<Text, Text, Text, Text> {
-        // Produces pairs where the first item is one set partition and the second item is the other one.
         public void reduce(Text key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException {
             ArrayList<String> storage = new ArrayList<String>();
@@ -150,6 +148,7 @@ public class SquareDetector extends Configured implements Tool {
             while (itr.hasNext())
                 storage.add(itr.next().toString());
 
+            // Emits partitions
             if (!storage.contains("-1")) {
                 for (int i = 0; i < storage.size(); i++)
                     context.write(new Text(storage.get(i).toString()), key);
