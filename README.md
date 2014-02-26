@@ -5,7 +5,7 @@ SquareDetector is a Java implementation of an algorithm for detecting complete b
 
 ## Setting up
 
-Before running the program, create `squarecounter/input` directory and move your input files to Hadoop Distributed File System (HDFS). Your output files will be available in the `squarecounter/output` directory.
+Before running the program, create a `squarecounter/input` directory and move your input files to Hadoop Distributed File System (HDFS). Your output files will be available in the `squarecounter/output` directory.
 
 To run your program you have to compile the SquareDetector.java source file and create a squaredetector.jar file. Run the application in Hadoop using the following command (first `cd` to the directory where Hadoop is installed):
 
