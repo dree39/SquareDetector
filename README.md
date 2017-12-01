@@ -14,3 +14,5 @@ To run your program you have to compile the SquareDetector.java source file and 
 where `<absolute-path>` is the directory path from root where your `squaredetector.jar` file is located.
 
 For technical support and information, feel free to contact me to andrea.benedetti AT ymail DOT com.
+
+This line is added at the very end of the current document.
